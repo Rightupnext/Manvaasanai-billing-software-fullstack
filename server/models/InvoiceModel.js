@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const InvoiceSchema = mongoose.Schema({
     dueDate: Date,
     currency: String,
-    items: [ { itemName: String, unitPrice: String, quantity: String, discount: String } ],
+    items: [ { itemName: String, unitPrice: String, quantity: String, discount: String,grams:String } ],
     rates: String,
     vat: Number,
     total: Number,

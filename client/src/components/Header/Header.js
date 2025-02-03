@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import decode from 'jwt-decode'
 import styles from './Header.module.css'
-
+import Logo from '../../images/Rightup next.jpg'
 import Button from '@material-ui/core/Button';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
@@ -116,7 +116,7 @@ const Header = () => {
 
     if(!user) return (
         <div className={styles.header2}>
-         <img style={{width: '50px', cursor: 'pointer'}} onClick={()=> history.push('/')} src="https://i.postimg.cc/hGZKzdkS/logo.png" alt="arc-invoice" />
+         <img style={{width: '100px', cursor: 'pointer'}} onClick={()=> history.push('/')} src={Logo} alt="arc-invoice" />
         <button onClick={()=> history.push('/login')} className={styles.login}>Get started</button>
         </div>
     )
