@@ -43,7 +43,7 @@ function App() {
           <Redirect exact from="/new-invoice" to="/invoice" />
 
         </Switch>
-        <Footer />
+        {/* <Footer /> */}
         </SnackbarProvider>
       </BrowserRouter>
     </div>

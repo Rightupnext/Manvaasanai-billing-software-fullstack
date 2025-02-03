@@ -309,7 +309,8 @@ if(!invoice) {
         <TableHead>
           <TableRow>
             <TableCell>Item</TableCell>
-            <TableCell >Qty</TableCell>
+            <TableCell >Kg</TableCell>
+            <TableCell >Grams</TableCell>
             <TableCell>Price</TableCell>
             <TableCell >Disc(%)</TableCell>
             <TableCell >Amount</TableCell>
@@ -321,8 +322,9 @@ if(!invoice) {
             <TableRow key={index}>
               <TableCell  scope="row" style={{width: '40%' }}> <InputBase style={{width: '100%'}} outline="none" sx={{ ml: 1, flex: 1 }} type="text" name="itemName" value={itemField.itemName} placeholder="Item name or description" readOnly /> </TableCell>
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="quantity" value={itemField?.quantity} placeholder="0" readOnly /> </TableCell>
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="grams" value={itemField?.grams} placeholder="0" readOnly /> </TableCell>
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="unitPrice" value={itemField?.unitPrice} placeholder="0" readOnly /> </TableCell>
-              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.discount} readOnly /> </TableCell>
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.discount} readOnly /> </TableCell> 
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="amount"  value={(itemField?.quantity * itemField.unitPrice) - (itemField.quantity * itemField.unitPrice) * itemField.discount / 100} readOnly /> </TableCell>
               
               
