@@ -197,7 +197,9 @@ if(!invoice) {
     <Spinner />
   )
 }
-
+const getImageURL = (id) => {
+  return `http://localhost:5000/profiles/image/${id}`;
+};
 
     return (
         <div className={styles.PageLayout}>
@@ -253,7 +255,7 @@ if(!invoice) {
             )
             : (
                 <Grid item onClick={() => history.push('/settings')} style={{cursor: 'pointer'}}>
-                    {company?.logo ? <img src={company?.logo} alt="Logo" className={styles.logo} /> 
+                    {company?.logo ? <img  src={getImageURL(company.logo)} alt="Logo" className={styles.logo} /> 
                     :
                     <h2>{company?.name}</h2>
                     }

@@ -9,7 +9,7 @@ import PhoneInTalkIcon from '@material-ui/icons/PhoneInTalk';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import AccountBalanceWalletRoundedIcon from '@material-ui/icons/AccountBalanceWalletRounded';
 import Avatar from '@material-ui/core/Avatar';
-
+import Logo from '../../../images/manvaasanai.png'
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -21,7 +21,9 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(12),
   },
 }));
-
+const getImageURL = (id) => {
+  return `http://localhost:5000/profiles/image/${id}`;
+};
 export default function ProfileDetail({ profiles }) {
   const classes = useStyles();
 
@@ -35,7 +37,7 @@ export default function ProfileDetail({ profiles }) {
     }}>
   <Avatar 
   alt={profiles?.businessName || "Business Logo"} 
-  src={profiles?.logo || "/default-logo.png"} 
+  src={profiles?.logo ? getImageURL(profiles.logo) : ""}
   className={classes.large} 
 />
 
