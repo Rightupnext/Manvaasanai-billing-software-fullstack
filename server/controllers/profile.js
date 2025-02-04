@@ -1,9 +1,74 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import mongodb from "mongodb";
 
+const { GridFSBucket } = mongodb;
 import ProfileModel from '../models/ProfileModel.js';
+const mongoURI = process.env.DB_URL;
+const conn = mongoose.createConnection(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-const router = express.Router();
+let gridFSBucket;
+conn.once("open", () => {
+  gridFSBucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
+  console.log("GridFSBucket Initialized");
+});
+export const uploadFile = async (req, res) => {
+  try {
+    if (!req.file || !req.body.userId) {
+      return res.status(400).json({ message: "File and userId are required" });
+    }
+
+    const { originalname, buffer } = req.file;
+    const uploadStream = gridFSBucket.openUploadStream(originalname);
+    
+    uploadStream.end(buffer);
+
+    uploadStream.on("finish", async () => {
+      // Update user profile with the new logo file ID
+      const updatedProfile = await ProfileModel.findOneAndUpdate(
+        { userId: req.body.userId },  // Find profile by userId
+        { logo: uploadStream.id },    // Save GridFS file ID in logo field
+        { new: true, upsert: true }   // Create profile if not exists
+      );
+
+      res.status(201).json({ message: "File uploaded successfully", fileId: uploadStream.id, profile: updatedProfile });
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const getImage = async (req, res) => {
+  try {
+    const { id } = req.params; // Fetch the ID from the URL parameters
+
+    // Check if the id is a valid 24-character hex string
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid image ID" });
+    }
+
+    const downloadStream = gridFSBucket.openDownloadStream(mongoose.Types.ObjectId(id)); // Use ObjectId to fetch the file
+
+    downloadStream.on("data", (chunk) => {
+      res.write(chunk);
+    });
+
+    downloadStream.on("end", () => {
+      res.end();
+    });
+
+    downloadStream.on("error", (err) => {
+      console.error("Error fetching image:", err);
+      res.status(404).json({ error: "Image not found" });
+    });
+  } catch (error) {
+    console.error("Error in getImage controller:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 export const getProfiles = async (req, res) => { 
   try {
