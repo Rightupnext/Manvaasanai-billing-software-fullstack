@@ -189,21 +189,25 @@ function ProductChart() {
     }
   }, [products]);
   const defaultColDef = useMemo(
-    () => ({
-      filter: "agTextColumnFilter",
-      floatingFilter: true,
-    }),
-    []
-  );
+      () => ({
+        filter: "agTextColumnFilter",
+  
+        floatingFilter: true,
+        resizable: true,
+        width: 338,
+        cellStyle: { textAlign: "center" }, 
+      }),
+      []
+    );
   return (
     <>
       <div className="h-full">
-        <div className="h-[500px] w-full sm:w-2/3 md:w-1/2 lg:w-[50rem] xl:w-[43rem] mx-auto">
+        <div className="h-[500px] w-full ml-[40px] px-[73px] ">
           <AgGridReact
             rowData={products}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
-            rowSelection={rowSelection}
+                 rowSelection="multiple"
             pagination={true}
             paginationPageSize={100}
             paginationPageSizeSelector={[100, 150, 200]}
@@ -212,7 +216,7 @@ function ProductChart() {
             suppressClipboardPaste={false}
           />
         </div>
-        <div id="productChart" style={{ marginLeft: "100px", height: "700px" }}>
+        <div id="productChart"  className="h-[500px] w-full ml-[40px] px-[73px] ">
           <h2>Product Data Chart</h2>
           {state.series.length > 0 ? (
             <ReactApexChart

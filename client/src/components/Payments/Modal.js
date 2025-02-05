@@ -124,6 +124,9 @@ const Modal = ({ setOpen, open, invoice }) => {
 
     const handleSubmitPayment =(e)=> {
         e.preventDefault()
+        if(payment.paymentMethod=="" ||payment.amountPaid===""){
+          return
+        }
           dispatch(updateInvoice(invoice._id, updatedInvoice))
           .then(() => {
             handleClose()
@@ -167,8 +170,7 @@ const Modal = ({ setOpen, open, invoice }) => {
                 style={{padding: 10}} 
                 variant="outlined" 
                 onChange={(e) => setPayment({...payment, amountPaid: e.target.value})}
-                value={(Math.round(payment.amountPaid * 10) / 10).toLocaleString()}
-
+                value={payment.amountPaid.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 10 })}
             />
 
             <Grid item fullWidth>
