@@ -1,18 +1,12 @@
 import express from "express";
-import { 
-  createProduct, 
-  getAllProducts, 
-  getProductById, 
-  updateProduct, 
-  deleteProduct 
-} from "../controllers/profuctController.js";
+import { addProductKiloGrams,addProductName ,getProducts,updateProductKiloGrams,deleteProduct} from "../controllers/profuctController.js";
 
 const router = express.Router();
 
-router.post("/products", createProduct);
-router.get("/products", getAllProducts);
-router.get("/products/:id", getProductById);
-router.put("/products/:id", updateProduct);
-router.delete("/products/:id", deleteProduct);
-
+// Route to add or update product
+router.post("/add-product-name", addProductName);
+router.get("/", getProducts);
+router.post("/add-kilo-grams", addProductKiloGrams);
+router.put("/update-kilo-grams", updateProductKiloGrams);
+router.delete("/delete-product/:id", deleteProduct); 
 export default router;

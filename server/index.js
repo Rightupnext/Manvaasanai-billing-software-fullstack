@@ -33,7 +33,7 @@ app.use('/invoices', invoiceRoutes)
 app.use('/clients', clientRoutes)
 app.use('/users', userRoutes)
 app.use('/profiles', profile)
-app.use("/api", productRoutes);
+app.use("/products", productRoutes);
 
 // NODEMAILER TRANSPORT FOR SENDING INVOICE VIA EMAIL
 const transporter = nodemailer.createTransport({

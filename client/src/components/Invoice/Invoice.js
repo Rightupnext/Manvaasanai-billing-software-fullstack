@@ -451,7 +451,7 @@ const Invoice = () => {
                 Amount
               </Typography>
               <Typography variant="h6" gutterBottom>
-                {currency} {toCommas(total)}
+                {currency} {toCommas(Math.round(total*10)/10)}
               </Typography>
             </Grid>
           </Grid>
@@ -602,16 +602,17 @@ const Invoice = () => {
           <div className={styles.summary}>Invoice Summary</div>
           <div className={styles.summaryItem}>
             <p>Sub total:</p>
-            <h4>{subTotal}</h4>
+            <h4>{Math.round(subTotal*10)/10}</h4>
           </div>
           <div className={styles.summaryItem}>
             <p>VAT(%):</p>
-            <h4>{vat}</h4>
+            <h4>{Math.round(vat*10)/10}</h4>
           </div>
           <div className={styles.summaryItem}>
             <p>Total</p>
             <h4 style={{ color: "black", fontSize: "18px", lineHeight: "8px" }}>
-              {currency} {toCommas(total)}
+              {currency} {toCommas(Math.round(total * 10) / 10)}
+
             </h4>
           </div>
         </div>
@@ -658,7 +659,7 @@ const Invoice = () => {
                       margin="normal"
                     />
                   )}
-                  value={currency.value}
+                  value={currency.value || currencies[0]}
                   defaultValue={"INR"}
                   onChange={(event, value) => setCurrency(value.value)}
                 />
