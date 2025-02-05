@@ -38,3 +38,16 @@ export const fetchProfilesByUser = (searchQuery) => API.get(`/profiles?searchQue
 export const createProfile = (newProfile) => API.post('/profiles', newProfile);
 export const updateProfile = (id, updatedProfile) => API.patch(`/profiles/${id}`, updatedProfile);
 export const deleteProfile = (id) => API.delete(`/profiles/${id}`);
+
+// Fetch all products
+export const fetchProducts = () => API.get('/products');
+
+// Add a new product with kilo grams
+export const addProduct = (product) => API.post('/products/add-kilo-grams', product);
+// Add a new product Name
+export const addProductName = (productName) => API.post('/products/add-product-name', { productName });
+// Update an existing product
+export const updateProduct = ( updatedProduct) => API.put(`/products/update-kilo-grams`, updatedProduct);
+
+// Delete a product
+export const deleteProduct = (id) => API.delete(`/products/delete-product/${id}`);

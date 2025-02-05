@@ -167,7 +167,8 @@ const Modal = ({ setOpen, open, invoice }) => {
                 style={{padding: 10}} 
                 variant="outlined" 
                 onChange={(e) => setPayment({...payment, amountPaid: e.target.value})}
-                value={payment.amountPaid}
+                value={(Math.round(payment.amountPaid * 10) / 10).toLocaleString()}
+
             />
 
             <Grid item fullWidth>

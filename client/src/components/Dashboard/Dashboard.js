@@ -94,7 +94,7 @@ const Dashboard = () => {
             <ul className={styles.autoGrid}>
                         <li className={styles.listItem} style={{backgroundColor: '#1976d2', color: 'white'}}>
                             <div>
-                                <p>{toCommas(totalPaid)}</p>
+                            <p>{toCommas((Math.round(totalPaid * 10) / 10))}</p>
                                 <h2 style={{color: 'white'}}>Payment Received</h2>
                             </div>
                             <div>
@@ -104,7 +104,7 @@ const Dashboard = () => {
 
                         <li className={styles.listItem} >
                             <div>
-                                <p>{toCommas(totalAmount - totalPaid)}</p>
+                            <p>{toCommas(Math.round((totalAmount - totalPaid) * 10) / 10)}</p>
                                 <h2>Pending Amount</h2>
                             </div>
                             <div>
@@ -114,7 +114,7 @@ const Dashboard = () => {
 
                         <li className={styles.listItem} >
                             <div>
-                                <p>{toCommas(totalAmount)}</p>
+                                <p>{toCommas((Math.round(totalAmount*10)/10))}</p>
                                 <h2>Total Amount</h2>
                             </div>
                             <div>
@@ -207,7 +207,7 @@ const Dashboard = () => {
                                 <td><button>{record?.paidBy?.charAt(0)}</button></td>
                                 <td>{record.paidBy}</td>
                                 <td>{moment(record.datePaid).format('MMMM Do YYYY')}</td>
-                                <td><h3 style={{color: '#00A86B', fontSize: '14px'}} >{toCommas(record.amountPaid)}</h3></td>
+                                <td><h3 style={{color: '#00A86B', fontSize: '14px'}} >{toCommas(Math.round(record.amountPaid * 10) / 10)}</h3></td>
                                 <td>{record.paymentMethod}</td>
                                 <td>{record.note}</td>
                             </tr>

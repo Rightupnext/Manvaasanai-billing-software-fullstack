@@ -24,7 +24,7 @@ const PaymentHistory = ({ paymentRecords}) => {
          {paymentRecords?.map((record) => (
            <tr key={record._id}>
             <td>{moment(record.datePaid).format('MMMM Do YYYY')}</td>
-            <td>{toCommas(record.amountPaid)}</td>
+            <td>{toCommas(Math.round(record.amountPaid * 10) / 10)}</td>
             <td>{record.paymentMethod}</td>
           </tr>
 
