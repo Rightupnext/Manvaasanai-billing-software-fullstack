@@ -119,22 +119,22 @@ const InvoiceDetails = () => {
   const createAndDownloadPdf = () => {
     setDownloadStatus('loading')
     axios.post(`${process.env.REACT_APP_API}/create-pdf`, 
-    { name: invoice.client.name,
-      address: invoice.client.address,
-      phone: invoice.client.phone,
-      email: invoice.client.email,
+    { name: invoice?.client?.name || "",
+      address: invoice?.client?.address || "",
+      phone: invoice?.client?.phone || "",
+      email: invoice?.client?.email || "",      
       dueDate: invoice.dueDate,
       date: invoice.createdAt,
       id: invoice.invoiceNumber,
       notes: invoice.notes,
-      subTotal: toCommas(invoice.subTotal),
-      total: toCommas(invoice.total),
+      subTotal: toCommas((Math.round(invoice.subTotal*10)/10).toLocaleString()),
+      total: toCommas(Math.round(invoice.total*10)/10).toLocaleString(),
       type: invoice.type,
       vat: invoice.vat,
       items: invoice.items,
       status: invoice.status,
       totalAmountReceived: toCommas(totalAmountReceived),
-      balanceDue: toCommas(total - totalAmountReceived),
+      balanceDue: toCommas(Math.round((total - totalAmountReceived) * 10) / 10).toLocaleString(),
       company: company,
   })
       .then(() => axios.get(`${process.env.REACT_APP_API}/fetch-pdf`, { responseType: 'blob' }))
@@ -283,7 +283,7 @@ const getImageURL = (id) => {
                     )}
                     <Container>
                         <Typography variant="overline" style={{color: 'gray', paddingRight: '3px'}} gutterBottom>Bill to</Typography>
-                        <Typography variant="subtitle2" gutterBottom>{client.name}</Typography>
+                        <Typography variant="subtitle2" gutterBottom>{client?client.name:"no name"}</Typography>
                         <Typography variant="body2" >{client?.email}</Typography>
                         <Typography variant="body2" >{client?.phone}</Typography>
                         <Typography variant="body2">{client?.address}</Typography>
@@ -315,7 +315,11 @@ const getImageURL = (id) => {
             <TableCell >Grams</TableCell>
             <TableCell>Price</TableCell>
             <TableCell >Disc(%)</TableCell>
-            <TableCell >Amount</TableCell>
+             <TableCell>Amount (without GST)</TableCell>
+                              <TableCell>CGST (5% for sweets, 12% for mixture)</TableCell>
+                              <TableCell>SGST (5% for sweets, 12% for mixture)</TableCell>
+                              <TableCell>Total Amount (including GST)</TableCell>
+            
            
           </TableRow>
         </TableHead>
@@ -327,7 +331,57 @@ const getImageURL = (id) => {
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="grams" value={itemField?.grams} placeholder="0" readOnly /> </TableCell>
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="unitPrice" value={itemField?.unitPrice} placeholder="0" readOnly /> </TableCell>
               <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.discount} readOnly /> </TableCell> 
-              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="amount"  value={(itemField?.quantity * itemField.unitPrice) - (itemField.quantity * itemField.unitPrice) * itemField.discount / 100} readOnly /> </TableCell>
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.unitPrice} readOnly /> </TableCell> 
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.CGST} readOnly /> </TableCell> 
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="discount"  value={itemField?.SGST} readOnly /> </TableCell> 
+              <TableCell align="right"> <InputBase sx={{ ml: 1, flex: 1 }} type="number" name="amount"  
+               value={(() => {
+                const unitPrice = Number(itemField.unitPrice) || 0; // Unit price per kg
+                const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+                const grams = Number(itemField.grams) || 0; // Extra grams
+                const discount = Number(itemField.discount) || 0; // Discount percentage
+                const cgstRate = Number(itemField.CGST) || 0; // CGST rate
+                const sgstRate = Number(itemField.SGST) || 0; // SGST rate
+            
+                // Validate inputs to ensure numbers are correct
+                if (
+                  isNaN(unitPrice) ||
+                  unitPrice <= 0 ||
+                  isNaN(quantity) ||
+                  quantity < 0 ||
+                  isNaN(grams) ||
+                  grams < 0 ||
+                  isNaN(discount) ||
+                  discount < 0 ||
+                  discount > 100 ||
+                  isNaN(cgstRate) ||
+                  cgstRate < 0 ||
+                  isNaN(sgstRate) ||
+                  sgstRate < 0
+                ) {
+                  return "0.00"; // Return 0 if values are invalid
+                }
+            
+                // Convert grams to kg correctly
+                const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
+            
+                // Calculate total amount
+                const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
+            
+                // Apply discount
+                const discountedAmount = totalAmount * (1 - discount / 100);
+            
+                // Calculate CGST and SGST
+                const cgstAmount = (discountedAmount * cgstRate) / 100;
+                const sgstAmount = (discountedAmount * sgstRate) / 100;
+            
+                // Calculate final total amount after adding CGST and SGST
+                const finalAmount = discountedAmount + cgstAmount + sgstAmount;
+            
+                // Return the final amount, fixed to 2 decimal places
+                return finalAmount.toFixed(2);
+              })()}
+              readOnly /> </TableCell>
               
               
             </TableRow>
@@ -345,10 +399,10 @@ const getImageURL = (id) => {
                         <p>Subtotal:</p>
                         <h4>{(Math.round(subTotal*10)/10).toLocaleString()}</h4>
                     </div>
-                    <div className={styles.summaryItem}>
+                    {/* <div className={styles.summaryItem}>
                         <p>{`VAT(${rates}%):`}</p>
                         <h4>{(Math.round(vat*10)/10).toLocaleString()}</h4>
-                    </div>
+                    </div> */}
                     <div className={styles.summaryItem}>
                         <p>Total</p>
                         <h4>{currency} {toCommas(Math.round(total*10)/10).toLocaleString()}</h4>
@@ -360,10 +414,10 @@ const getImageURL = (id) => {
 
                     <div className={styles.summaryItem}>
                         <p>Balance</p>
-                        <h4 style={{ color: "black", fontSize: "18px", lineHeight: "8px" }}>
-  {currency} {toCommas(Math.round((total - totalAmountReceived) * 100) / 100).toLocaleString()}
+                         <h4 style={{ color: "black", fontSize: "18px", lineHeight: "8px" }}>
+  {currency} {toCommas(Math.round((total - totalAmountReceived) * 10) / 10).toLocaleString()}
 </h4>
-
+   
                     </div>
                     
                 </div>

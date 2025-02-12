@@ -74,24 +74,21 @@ function AddStock() {
   return (
     <>
       <div className="">
+        <div className="grid grid-cols-3">
         <button
           onClick={handleModelOpen}
-          className=" ml-[90px] focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900"
+          className="h-[40px]  w-[40%] mt-2 ml-[90px] focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900"
         >
           ADD PRODUCT NAME
         </button>
-        <button
-          onClick={handleModelOpen2}
-          className=" ml-[90px] focus:outline-none text-white bg-indigo-400 hover:bg-indigo--500 focus:ring-4 focus:ring-indigo--300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-indigo-900"
-        >
-          REDUCE PRODUCT
-        </button>
+        
+       
         <form
-          className="space-y-6 px-4 max-w-sm mx-auto font-[sans-serif]"
+          className="space-y-6 px-4 max-w-sm mx-auto font-[sans-serif] mt-1"
           onSubmit={handleSubmit}
         >
           <div>
-            <h1>Add Product</h1>
+            <h1 className="text-center text-xl font-bold">Add Product</h1>
           </div>
 
           <div className="flex items-center">
@@ -106,7 +103,7 @@ function AddStock() {
               <option value="">Select Product</option>{" "}
               {products && products.length > 0 ? (
                 products.map((product) => (
-                  <option key={product._id} value={product.productName}>
+                  <option key={product._id} value={product.productName} className="">
                     {product.productName}
                   </option>
                 ))
@@ -147,7 +144,13 @@ function AddStock() {
             Submit
           </button>
         </form>
-
+        <button
+          onClick={handleModelOpen2}
+          className="h-[40px]  w-[40%] mt-2  ml-[290px]  focus:outline-none text-white bg-indigo-400 hover:bg-indigo--500 focus:ring-4 focus:ring-indigo--300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-indigo-900"
+        >
+          REDUCE PRODUCT
+        </button>
+        </div>
         {modelOpen && (
           <AddProductNameModel
             handleCloseModel={handleModelClose}

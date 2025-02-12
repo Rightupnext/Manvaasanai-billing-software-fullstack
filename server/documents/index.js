@@ -20,6 +20,36 @@ export default function ({
   company,
 }) {
   const today = new Date();
+  const formattedItems = items.map(item => {
+    const unitPrice = Number(item.unitPrice) || 0;
+    const quantity = Number(item.quantity) || 0;
+    const grams = Number(item.grams) || 0;
+    const discount = Number(item.discount) || 0;
+    const cgstRate = Number(item.CGST) || 0;
+    const sgstRate = Number(item.SGST) || 0;
+  
+    // Convert grams to kg correctly
+    const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
+  
+    // Calculate total amount
+    const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
+  
+    // Apply discount
+    const discountedAmount = totalAmount * (1 - discount / 100);
+  
+    // Calculate CGST and SGST
+    const cgstAmount = (discountedAmount * cgstRate) / 100;
+    const sgstAmount = (discountedAmount * sgstRate) / 100;
+  
+    // Calculate final total amount after adding CGST and SGST
+    const finalAmount = discountedAmount + cgstAmount + sgstAmount;
+  
+    return {
+      ...item,
+      finalAmount: finalAmount.toFixed(2), // Format the finalAmount to 2 decimal places
+    };
+  });
+  
   return `<!DOCTYPE html>
 <html class="no-js" lang="en">
   <head>
@@ -2583,7 +2613,7 @@ hr {
                             href="/cdn-cgi/l/email-protection"
                             class="__cf_email__"
                             data-cfemail="d8abada8a8b7aaac98bfb5b9b1b4f6bbb7b5"
-                            >admin@gmail.com</a
+                            >${company.email}</a
                           >
                           <br />
                         </div>
@@ -2602,8 +2632,9 @@ hr {
                             href="/cdn-cgi/l/email-protection"
                             class="__cf_email__"
                             data-cfemail="d8abada8a8b7aaac98bfb5b9b1b4f6bbb7b5"
-                            >+ 99(0) 131 124 567
-                            Monday to Friday</a
+                            >${company.phoneNumber
+}
+                            </a
                           >
                           <br />
                         </div>
@@ -2620,7 +2651,8 @@ hr {
                             href="/cdn-cgi/l/email-protection"
                             class="__cf_email__"
                             data-cfemail="d8abada8a8b7aaac98bfb5b9b1b4f6bbb7b5"
-                            >${address}</a
+                            >${company.contactAddress
+}</a
                           >
                           <br />
                         </div>
@@ -2679,7 +2711,7 @@ hr {
                     <th>
                       <div >
                         <span>Grand Total:</span> <br />
-                        <b class="tm_f18 tm_accent_color">${total}</b>
+                        <b class="tm_f18 tm_accent_color">₹${total}</b>
                       </div>
                     </th>
                   </thead>
@@ -2700,7 +2732,10 @@ hr {
                           Item
                         </th>
                         <th class="tm_width_1 tm_semi_bold tm_primary_color">
-                          Qty
+                          Kg
+                        </th>
+                        <th class="tm_width_1 tm_semi_bold tm_primary_color">
+                          Gram
                         </th>
                         <th class="tm_width_2 tm_semi_bold tm_primary_color">
                           Price
@@ -2708,32 +2743,45 @@ hr {
                         <th class="tm_width_2 tm_semi_bold tm_primary_color">
                           Disc(%)
                         </th>
+                        <th class="tm_width_2 tm_semi_bold tm_primary_color">
+                         Amount (without GST)
+                        </th>
+                        <th class="tm_width_2 tm_semi_bold tm_primary_color">
+                         CGST (5% for sweets, 12% for mixture)
+                        </th>
+                        <th class="tm_width_2 tm_semi_bold tm_primary_color">
+                      SGST (5% for sweets, 12% for mixture)
+                        </th>
                        
                         <th
                           class="tm_width_2 tm_semi_bold tm_primary_color tm_text_right"
                         >
-                          Total
+                         Total Amount (including GST)
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                     
-                 ${items
-  .map(
-    (item) => `
+                 ${formattedItems
+                   .map(
+                     (item) => `
   <tr class="tm_gray_bg">
     <td class="tm_width_7">
       <p class="tm_m0 tm_f16 tm_primary_color">${item.itemName}</p>
     </td>
     <td class="tm_width_1">${item.quantity}</td>
+    <td class="tm_width_2">${item.grams}</td>
     <td class="tm_width_2">${item.unitPrice}</td>
     <td>${item.discount}</td>
+     <td class="tm_width_2">${item.unitPrice}</td>
+     <td class="tm_width_2">${item.CGST}</td>
+     <td class="tm_width_2">${item.SGST}</td>
     <td class="tm_width_2 tm_text_right">
-      ${item.quantity * item.unitPrice - (item.quantity * item.unitPrice * (item.discount || 0)) / 100}
+      ${item.finalAmount}
     </td>
   </tr>`
-  )
-  .join('')}
+                   )
+                   .join("")}
 
                      
                     </tbody>
@@ -2761,21 +2809,13 @@ hr {
                         <td
                           class="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_bold"
                         >
-                          $${subTotal}
+                          ₹${subTotal}
                         </td>
                       </tr>
                       
                       <tr>
-                        <td
-                          class="tm_width_3 tm_danger_color tm_border_none tm_pt0"
-                        >
-                        Tax 5%
-                        </td>
-                        <td
-                          class="tm_width_3 tm_danger_color tm_text_right tm_border_none tm_pt0"
-                        >
-                          +$${vat}
-                        </td>
+                       
+                      
                       </tr>
                       <tr>
                         <td
@@ -2786,7 +2826,7 @@ hr {
                         <td
                           class="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0"
                         >
-                          +$${total}
+                          ₹${total}
                         </td>
                       </tr>
                       <tr>
@@ -2798,7 +2838,7 @@ hr {
                         <td
                           class="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0"
                         >
-                          +$${totalAmountReceived}
+                          ₹${totalAmountReceived}
                         </td>
                       </tr>
                       <tr>
@@ -2810,7 +2850,7 @@ hr {
                         <td
                           class="tm_width_3 tm_primary_color tm_text_right tm_border_none tm_pt0"
                         >
-                          +$${balanceDue}
+                          ₹${balanceDue}
                         </td>
                       </tr>
                       <tr>
@@ -2822,7 +2862,7 @@ hr {
                         <td
                           class="tm_width_3 tm_border_top_0 tm_bold tm_f18 tm_primary_color tm_text_right tm_white_color tm_accent_bg tm_radius_0_6_6_0"
                         >
-                          $1732
+                                                    ₹ ${total}
                         </td>
                       </tr>
                     </tbody>

@@ -41,8 +41,8 @@ export default function Uploader({ form, setForm }) {
         method: "POST",
         body: formData,
       });
-  
       const data = await response.json();
+      localStorage.setItem("logo",data.fileId)
       setFile(data.fileId); // Store GridFS file ID
       setProgress(100);
       console.log("Uploaded file ID:", data.fileId);

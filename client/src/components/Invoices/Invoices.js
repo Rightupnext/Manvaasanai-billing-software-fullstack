@@ -218,7 +218,7 @@ const Invoices = () => {
           ).map((row) => (
             <TableRow key={row._id} style={{cursor: 'pointer'}} >
                 <TableCell style={tableStyle} onClick={() => openInvoice(row._id)}> {row.invoiceNumber} </TableCell>
-                <TableCell  style={tableStyle} onClick={() => openInvoice(row._id)} > {row.client.name} </TableCell>
+                <TableCell  style={tableStyle} onClick={() => openInvoice(row._id)} > {row.client?row.client.name:"no name"} </TableCell>
                 {/* <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} >{row.currency} {row.total? toCommas(row.total): row.total} </TableCell> */}
                 <TableCell style={tableStyle} onClick={() => openInvoice(row._id)} >{row.currency} {row.total ? toCommas(Math.round(row.total * 10) / 10).toLocaleString() : row.total}
                 </TableCell>
