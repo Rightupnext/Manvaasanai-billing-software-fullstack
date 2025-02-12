@@ -212,7 +212,7 @@ const Invoice = () => {
       ...prevState,
       items: [
         ...prevState.items,
-        { itemName: "", unitPrice: "", quantity: "", discount: "", amount: "" },
+        { itemName: "", unitPrice: "", quantity: "", discount: "", amount: "  " },
       ],
     }));
   };
@@ -227,53 +227,47 @@ const Invoice = () => {
   // console.log(invoiceData)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (invoice) {
-      dispatch(
-        updateInvoice(invoice._id, {
-          ...invoiceData,
-          subTotal: subTotal,
-          total: total,
-          vat: vat,
-          rates: rates,
-          currency: currency,
-          dueDate: selectedDate,
-          client,
-          type: type,
-          status: status,
-        })
-      );
-      history.push(`/invoice/${invoice._id}`);
-    } else {
-      dispatch(
-        createInvoice(
-          {
-            ...invoiceData,
-            subTotal: subTotal,
-            total: total,
-            vat: vat,
-            rates: rates,
-            currency: currency,
-            dueDate: selectedDate,
-            invoiceNumber: `${
-              invoiceData.invoiceNumber < 100
-                ? Number(invoiceData.invoiceNumber).toString().padStart(3, "0")
-                : Number(invoiceData.invoiceNumber)
-            }`,
-            client,
-            type: type,
-            status: status,
-            paymentRecords: [],
-            creator: [user?.result?._id || user?.result?.googleId],
-          },
-          history
-        )
-      );
-    }
+    const roundedSubTotal = Math.round(subTotal * 100) / 100; 
+  const roundedTotal = Math.round(total * 100) / 100; 
+  const roundedVat = Math.round(vat * 100) / 100; 
+
+  // Prepare the data with rounded values
+  const invoiceDataWithRoundedValues = {
+    ...invoiceData,
+    subTotal: roundedSubTotal,
+    total: roundedTotal,
+    vat: roundedVat,
+    rates: rates,
+    currency: currency,
+    dueDate: selectedDate,
+    client,
+    type: type,
+    status: status,
+  };
+
+  if (invoice) {
+    dispatch(updateInvoice(invoice._id, invoiceDataWithRoundedValues));
+    history.push(`/invoice/${invoice._id}`);
+  } else {
+    dispatch(
+      createInvoice(
+        {
+          ...invoiceDataWithRoundedValues,
+          invoiceNumber: `${invoiceData.invoiceNumber < 100
+            ? Number(invoiceData.invoiceNumber).toString().padStart(3, "0")
+            : Number(invoiceData.invoiceNumber)}`,
+          paymentRecords: [],
+          creator: [user?.result?._id || user?.result?.googleId],
+        },
+        history
+      )
+    );
+  }
 
     // setInvoiceData(initialState)
   };
 
+  
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
@@ -284,7 +278,10 @@ const Invoice = () => {
   if (!user) {
     history.push("/login");
   }
-
+const logoId=localStorage.getItem('logo');
+  const getImageURL = (id) => {
+    return `http://localhost:5000/profiles/image/${id}`;
+  };
   return (
     <div className={styles.invoiceLayout}>
       <form onSubmit={handleSubmit} className="mu-form">
@@ -292,11 +289,11 @@ const Invoice = () => {
         <Container className={classes.headerContainer}>
           <Grid container justifyContent="space-between">
             <Grid item>
-              <Avatar
+              <img
                 alt="Logo"
-                variant="square"
+                
                 src={Logo}
-                className={classes.large}
+                className="w-[125px] mt-[10px] h-[125px]"
               />
             </Grid>
             <Grid item>
@@ -385,7 +382,7 @@ const Invoice = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        required={!invoice && true}
+                        // required={invoice}
                         label="Select Customer"
                         margin="normal"
                         variant="outlined"
@@ -467,7 +464,10 @@ const Invoice = () => {
                   <TableCell>Grams</TableCell>
                   <TableCell>Price</TableCell>
                   <TableCell>Disc(%)</TableCell>
-                  <TableCell>Amount</TableCell>
+                  <TableCell>Amount (without GST)</TableCell>
+                  <TableCell>CGST (5% for sweets, 12% for mixture)</TableCell>
+                  <TableCell>SGST (5% for sweets, 12% for mixture)</TableCell>
+                  <TableCell>Total Amount (including GST)</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -528,57 +528,98 @@ const Invoice = () => {
                         name="discount"
                         onChange={(e) => handleChange(index, e)}
                         value={itemField.discount}
+                        placeholder="0 %"
+                      />{" "}
+                    </TableCell>
+                    <TableCell align="right">
+                    {" "}
+                      <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        type="number"
+                        name="unitPrice"
+                      disabled
+                        value={itemField.unitPrice}
                         placeholder="0"
                       />{" "}
                     </TableCell>
                     <TableCell align="right">
+                    {" "}
                       <InputBase
                         sx={{ ml: 1, flex: 1 }}
                         type="number"
-                        name="amount"
+                        name="CGST"
                         onChange={(e) => handleChange(index, e)}
-                        value={(() => {
-                          const unitPrice = Number(itemField.unitPrice) || 0; // Unit price per kg
-                          const quantity = Number(itemField.quantity) || 0; // Quantity in kg
-                          const grams = Number(itemField.grams) || 0; // Extra grams
-                          const discount = Number(itemField.discount) || 0; // Discount percentage
+                        value={itemField.CGST}
+                        placeholder="0 %"
+                      />{" "}
+                      
+                    </TableCell>
+                    <TableCell align="right">
+                    {" "}
+                      <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        type="number"
+                        name="SGST"
+                        onChange={(e) => handleChange(index, e)}
+                        value={itemField.SGST}
+                        placeholder="0 %"
+                      />{" "}
+                    </TableCell>
+                    <TableCell align="right">
+                    <InputBase
+  sx={{ ml: 1, flex: 1 }}
+  type="number"
+  name="amount"
+  onChange={(e) => handleChange(index, e)}
+  value={(() => {
+    const unitPrice = Number(itemField.unitPrice) || 0; // Unit price per kg
+    const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+    const grams = Number(itemField.grams) || 0; // Extra grams
+    const discount = Number(itemField.discount) || 0; // Discount percentage
+    const cgstRate = Number(itemField.CGST) || 0; // CGST rate
+    const sgstRate = Number(itemField.SGST) || 0; // SGST rate
 
-                          // Validate inputs to ensure numbers are correct
-                          if (
-                            isNaN(unitPrice) ||
-                            unitPrice <= 0 ||
-                            isNaN(quantity) ||
-                            quantity < 0 ||
-                            isNaN(grams) ||
-                            grams < 0 ||
-                            isNaN(discount) ||
-                            discount < 0 ||
-                            discount > 100
-                          ) {
-                            return "0.00"; // Return 0 if values are invalid
-                          }
+    // Validate inputs to ensure numbers are correct
+    if (
+      isNaN(unitPrice) ||
+      unitPrice <= 0 ||
+      isNaN(quantity) ||
+      quantity < 0 ||
+      isNaN(grams) ||
+      grams < 0 ||
+      isNaN(discount) ||
+      discount < 0 ||
+      discount > 100 ||
+      isNaN(cgstRate) ||
+      cgstRate < 0 ||
+      isNaN(sgstRate) ||
+      sgstRate < 0
+    ) {
+      return "0.00"; // Return 0 if values are invalid
+    }
 
-                          // Convert grams to kg correctly
-                          const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
+    // Convert grams to kg correctly
+    const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
 
-                          // Calculate total amount
-                          const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
+    // Calculate total amount
+    const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
 
-                          // Apply discount
-                          const discountedAmount =
-                            totalAmount * (1 - discount / 100);
+    // Apply discount
+    const discountedAmount = totalAmount * (1 - discount / 100);
 
-                          // console.log("unitPrice:", unitPrice);
-                          // console.log("quantity:", quantity);
-                          // console.log("grams:", grams);
-                          // console.log("totalKg:", totalKg); // Should correctly show 1.3 for 1kg 300g
-                          // console.log("totalAmount:", totalAmount);
-                          // console.log("discountedAmount:", discountedAmount);
+    // Calculate CGST and SGST
+    const cgstAmount = (discountedAmount * cgstRate) / 100;
+    const sgstAmount = (discountedAmount * sgstRate) / 100;
 
-                          return discountedAmount.toFixed(2); // Fixed to 2 decimal places
-                        })()}
-                        disabled
-                      />
+    // Calculate final total amount after adding CGST and SGST
+    const finalAmount = discountedAmount + cgstAmount + sgstAmount;
+
+    // Return the final amount, fixed to 2 decimal places
+    return finalAmount.toFixed(2);
+  })()}
+  disabled
+/>
+
                     </TableCell>
 
                     <TableCell align="right">
@@ -604,10 +645,10 @@ const Invoice = () => {
             <p>Sub total:</p>
             <h4>{(Math.round(subTotal * 10) / 10).toLocaleString()}</h4>
           </div>
-          <div className={styles.summaryItem}>
+          {/* <div className={styles.summaryItem}>
             <p>VAT(%):</p>
             <h4>{(Math.round(vat * 10) / 10).toLocaleString()}</h4>
-          </div>
+          </div> */}
           <div className={styles.summaryItem}>
             <p>Total</p>
             <h4 style={{ color: "black", fontSize: "18px", lineHeight: "8px" }}>
@@ -621,7 +662,7 @@ const Invoice = () => {
           <Container>
             <Grid container>
               <Grid item style={{ marginTop: "16px", marginRight: 10 }}>
-                <TextField
+                {/* <TextField
                   type="text"
                   step="any"
                   name="rates"
@@ -630,7 +671,7 @@ const Invoice = () => {
                   onChange={handleRates}
                   placeholder="e.g 10"
                   label="Tax Rates(%)"
-                />
+                /> */}
               </Grid>
               <Grid item style={{ marginRight: 10 }}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>

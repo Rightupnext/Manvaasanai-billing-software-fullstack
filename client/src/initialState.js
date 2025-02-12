@@ -3,7 +3,7 @@ const user = JSON.parse(localStorage.getItem('profile'))
 
 export const initialState = {
     items: [
-        {itemName: '', unitPrice: '', quantity: '', discount: '',grams:""},
+        {itemName: '', unitPrice: '', quantity: '', discount: '',grams:"",CGST:"",SGST:""},
     ],
     total: 0,
     notes: user?.userProfile?.paymentDetails,
