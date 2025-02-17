@@ -29,12 +29,12 @@ app.use((express.json({ limit: "30mb", extended: true})))
 app.use((express.urlencoded({ limit: "30mb", extended: true})))
 app.use((cors()))
 
-app.use('/invoices', invoiceRoutes)
-app.use('/clients', clientRoutes)
-app.use('/users', userRoutes)
-app.use('/profiles', profile)
-app.use("/products", productRoutes);
-app.use("/category", CategoryRoutes);
+app.use('/api/invoices', invoiceRoutes)
+app.use('/api/clients', clientRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/profiles', profile)
+app.use("/api/products", productRoutes);
+app.use("/api/category", CategoryRoutes);
 
 // NODEMAILER TRANSPORT FOR SENDING INVOICE VIA EMAIL
 const transporter = nodemailer.createTransport({
