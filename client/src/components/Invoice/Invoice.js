@@ -43,6 +43,8 @@ import AddClient from "./AddClient";
 import InvoiceType from "./InvoiceType";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { getProducts } from "../../actions/productAction";
+import { GetCategory } from "../../actions/categoryAction";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 const Invoice = () => {
   const location = useLocation();
   const [invoiceData, setInvoiceData] = useState(initialState);
-  const [rates, setRates] = useState(0);
+  const [rates, setRates] = useState("");
   const [vat, setVat] = useState(0);
   const [currency, setCurrency] = useState(currencies[0].value);
   const [subTotal, setSubTotal] = useState(0);
@@ -89,7 +91,15 @@ const Invoice = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const user = JSON.parse(localStorage.getItem("profile"));
-
+  const products = useSelector((state) => state.products.products);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const categories = useSelector((state) => state.categories);
+  useEffect(() => {
+    dispatch(getProducts());
+  }, [dispatch]);
+  useEffect(() => {
+    dispatch(GetCategory());
+  }, [dispatch]);
   useEffect(() => {
     getTotalCount();
     // eslint-disable-next-line
@@ -164,6 +174,40 @@ const Invoice = () => {
 
   // console.log(invoiceData)
   // Change handler for dynamically added input field
+  const handleProductSelect = (index, productName) => {
+    const selected = products.find(
+      (product) => product.productName === productName
+    );
+
+    if (selected) {
+      console.log("Selected Product:", selected);
+      console.log("Category Name:", selected.category?.categoryName);
+      console.log(
+        "CGST:",
+        selected.category?.CGST,
+        "SGST:",
+        selected.category?.SGST
+      );
+
+      setInvoiceData((prev) => {
+        const updatedItems = prev.items.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                itemName: selected.productName,
+                unitPrice: selected.unitPrice,
+                CGST: selected.category?.CGST ?? "0", // Extract CGST correctly
+                SGST: selected.category?.SGST ?? "0", // Extract SGST correctly
+                categoryName: selected.category?.categoryName || "",
+              }
+            : item
+        );
+
+        return { ...prev, items: updatedItems };
+      });
+    }
+  };
+
   const handleChange = (index, e) => {
     const { name, value } = e.target;
     const values = [...invoiceData.items];
@@ -212,7 +256,15 @@ const Invoice = () => {
       ...prevState,
       items: [
         ...prevState.items,
-        { itemName: "", unitPrice: "", quantity: "", discount: "", amount: "  " },
+        {
+          itemName: "",
+          unitPrice: "",
+          quantity: "",
+          discount: "",
+          amount: "",
+          CGST: "",
+          SGST: "",
+        }, // Ensure new row is empty
       ],
     }));
   };
@@ -227,47 +279,48 @@ const Invoice = () => {
   // console.log(invoiceData)
 
   const handleSubmit = async (e) => {
-    const roundedSubTotal = Math.round(subTotal * 100) / 100; 
-  const roundedTotal = Math.round(total * 100) / 100; 
-  const roundedVat = Math.round(vat * 100) / 100; 
+    const roundedSubTotal = Math.round(subTotal * 100) / 100;
+    const roundedTotal = Math.round(total * 100) / 100;
+    const roundedVat = Math.round(vat * 100) / 100;
 
-  // Prepare the data with rounded values
-  const invoiceDataWithRoundedValues = {
-    ...invoiceData,
-    subTotal: roundedSubTotal,
-    total: roundedTotal,
-    vat: roundedVat,
-    rates: rates,
-    currency: currency,
-    dueDate: selectedDate,
-    client,
-    type: type,
-    status: status,
-  };
+    // Prepare the data with rounded values
+    const invoiceDataWithRoundedValues = {
+      ...invoiceData,
+      subTotal: roundedSubTotal,
+      total: roundedTotal,
+      vat: roundedVat,
+      rates: rates,
+      currency: currency,
+      dueDate: selectedDate,
+      client,
+      type: type,
+      status: status,
+    };
 
-  if (invoice) {
-    dispatch(updateInvoice(invoice._id, invoiceDataWithRoundedValues));
-    history.push(`/invoice/${invoice._id}`);
-  } else {
-    dispatch(
-      createInvoice(
-        {
-          ...invoiceDataWithRoundedValues,
-          invoiceNumber: `${invoiceData.invoiceNumber < 100
-            ? Number(invoiceData.invoiceNumber).toString().padStart(3, "0")
-            : Number(invoiceData.invoiceNumber)}`,
-          paymentRecords: [],
-          creator: [user?.result?._id || user?.result?.googleId],
-        },
-        history
-      )
-    );
-  }
+    if (invoice) {
+      dispatch(updateInvoice(invoice._id, invoiceDataWithRoundedValues));
+      history.push(`/invoice/${invoice._id}`);
+    } else {
+      dispatch(
+        createInvoice(
+          {
+            ...invoiceDataWithRoundedValues,
+            invoiceNumber: `${
+              invoiceData.invoiceNumber < 100
+                ? Number(invoiceData.invoiceNumber).toString().padStart(3, "0")
+                : Number(invoiceData.invoiceNumber)
+            }`,
+            paymentRecords: [],
+            creator: [user?.result?._id || user?.result?.googleId],
+          },
+          history
+        )
+      );
+    }
 
     // setInvoiceData(initialState)
   };
 
-  
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
@@ -278,10 +331,11 @@ const Invoice = () => {
   if (!user) {
     history.push("/login");
   }
-const logoId=localStorage.getItem('logo');
+  const logoId = localStorage.getItem("logo");
   const getImageURL = (id) => {
     return `http://localhost:5000/profiles/image/${id}`;
   };
+
   return (
     <div className={styles.invoiceLayout}>
       <form onSubmit={handleSubmit} className="mu-form">
@@ -291,7 +345,6 @@ const logoId=localStorage.getItem('logo');
             <Grid item>
               <img
                 alt="Logo"
-                
                 src={Logo}
                 className="w-[125px] mt-[10px] h-[125px]"
               />
@@ -448,7 +501,8 @@ const logoId=localStorage.getItem('logo');
                 Amount
               </Typography>
               <Typography variant="h6" gutterBottom>
-                {currency} {toCommas(Math.round(total*10)/10).toLocaleString()}
+                {currency}{" "}
+                {toCommas(Math.round(total * 10) / 10).toLocaleString()}
               </Typography>
             </Grid>
           </Grid>
@@ -465,8 +519,8 @@ const logoId=localStorage.getItem('logo');
                   <TableCell>Price</TableCell>
                   <TableCell>Disc(%)</TableCell>
                   <TableCell>Amount (without GST)</TableCell>
-                  <TableCell>CGST (5% for sweets, 12% for mixture)</TableCell>
-                  <TableCell>SGST (5% for sweets, 12% for mixture)</TableCell>
+                  <TableCell>CGST (2.5% for sweets, 6% for mixture)</TableCell>
+                  <TableCell>SGST (2.5% for sweets, 6% for mixture)</TableCell>
                   <TableCell>Total Amount (including GST)</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
@@ -475,18 +529,36 @@ const logoId=localStorage.getItem('logo');
                 {invoiceData.items.map((itemField, index) => (
                   <TableRow key={index}>
                     <TableCell scope="row" style={{ width: "40%" }}>
-                      {" "}
+                      <select
+                        key={index}
+                        name="productName"
+                        value={itemField.itemName || ""}
+                        onChange={(e) =>
+                          handleProductSelect(index, e.target.value)
+                        }
+                        className="px-2 py-2 w-1/2 border-b-2 focus:border-[#333] outline-none text-sm bg-white"
+                      >
+                        <option value="">Select Product</option>
+                        {products.map((product) => (
+                          <option key={product._id} value={product.productName}>
+                            {product.productName}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Item Name Input */}
                       <InputBase
-                        style={{ width: "100%" }}
+                        style={{ width: "50%" }}
                         outline="none"
-                        sx={{ ml: 1, flex: 1 }}
+                        sx={{ flex: 1 }}
                         type="text"
                         name="itemName"
                         onChange={(e) => handleChange(index, e)}
-                        value={itemField.itemName}
+                        value={invoiceData.items[index]?.itemName || ""}
                         placeholder="Item name or description"
-                      />{" "}
+                      />
                     </TableCell>
+
                     <TableCell align="right">
                       {" "}
                       <InputBase
@@ -532,94 +604,158 @@ const logoId=localStorage.getItem('logo');
                       />{" "}
                     </TableCell>
                     <TableCell align="right">
-                    {" "}
+                      {" "}
                       <InputBase
                         sx={{ ml: 1, flex: 1 }}
                         type="number"
                         name="unitPrice"
-                      disabled
-                        value={itemField.unitPrice}
+                        disabled
+                        value={(() => {
+                          const unitPrice = Number(itemField.unitPrice) || 0; // Price per kg
+                          const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+                          const grams = Number(itemField.grams) || 0; // Extra grams
+                          const discount = Number(itemField.discount) || 0; // Ensure discount defaults to 0
+
+                          // Convert grams to kg correctly
+                          const totalKg = (quantity * 1000 + grams) / 1000;
+
+                          // Calculate total amount
+                          const totalAmount = totalKg * unitPrice;
+
+                          // Calculate discount amount
+                          const discountAmount = (totalAmount * discount) / 100;
+
+                          // Ensure the result is non-negative
+                          const finalAmount = Math.max(
+                            totalAmount - discountAmount,
+                            0
+                          );
+
+                          // Return the formatted value
+                          return finalAmount.toFixed(2);
+                        })()}
                         placeholder="0"
                       />{" "}
                     </TableCell>
                     <TableCell align="right">
-                    {" "}
                       <InputBase
                         sx={{ ml: 1, flex: 1 }}
                         type="number"
                         name="CGST"
                         onChange={(e) => handleChange(index, e)}
-                        value={itemField.CGST}
+                        value={(() => {
+                          const unitPrice = Number(itemField.unitPrice) || 0; // Price per kg
+                          const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+                          const grams = Number(itemField.grams) || 0; // Extra grams
+
+                          // Convert grams to kg correctly
+                          const totalKg = (quantity * 1000 + grams) / 1000;
+
+                          // Calculate total amount (without discount)
+                          const finalAmount = totalKg * unitPrice;
+
+                          // Get CGST percentage from invoiceData
+                          const cgstRate =
+                            Number(invoiceData.items[index]?.CGST) || 0;
+
+                          // Calculate CGST amount
+                          const cgst = (finalAmount * cgstRate) / 100;
+
+                          // Return the formatted value
+                          return cgst.toFixed(2);
+                        })()}
                         placeholder="0 %"
-                      />{" "}
-                      
+                      />
                     </TableCell>
                     <TableCell align="right">
-                    {" "}
                       <InputBase
                         sx={{ ml: 1, flex: 1 }}
                         type="number"
                         name="SGST"
                         onChange={(e) => handleChange(index, e)}
-                        value={itemField.SGST}
+                        value={(() => {
+                          const unitPrice = Number(itemField.unitPrice) || 0; // Price per kg
+                          const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+                          const grams = Number(itemField.grams) || 0; // Extra grams
+
+                          // Convert grams to kg correctly
+                          const totalKg = (quantity * 1000 + grams) / 1000;
+
+                          // Calculate total amount (without discount)
+                          const finalAmount = totalKg * unitPrice;
+
+                          // Get SGST percentage from invoiceData
+                          const sgstRate =
+                            Number(invoiceData.items[index]?.SGST) || 0;
+
+                          // Calculate SGST amount
+                          const sgst = (finalAmount * sgstRate) / 100;
+
+                          // Return the formatted value
+                          return sgst.toFixed(2);
+                        })()}
                         placeholder="0 %"
-                      />{" "}
+                      />
                     </TableCell>
+
                     <TableCell align="right">
-                    <InputBase
-  sx={{ ml: 1, flex: 1 }}
-  type="number"
-  name="amount"
-  onChange={(e) => handleChange(index, e)}
-  value={(() => {
-    const unitPrice = Number(itemField.unitPrice) || 0; // Unit price per kg
-    const quantity = Number(itemField.quantity) || 0; // Quantity in kg
-    const grams = Number(itemField.grams) || 0; // Extra grams
-    const discount = Number(itemField.discount) || 0; // Discount percentage
-    const cgstRate = Number(itemField.CGST) || 0; // CGST rate
-    const sgstRate = Number(itemField.SGST) || 0; // SGST rate
+                      <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        type="number"
+                        name="amount"
+                        onChange={(e) => handleChange(index, e)}
+                        value={(() => {
+                          const unitPrice = Number(itemField.unitPrice) || 0; // Unit price per kg
+                          const quantity = Number(itemField.quantity) || 0; // Quantity in kg
+                          const grams = Number(itemField.grams) || 0; // Extra grams
+                          const discount = Number(itemField.discount) || 0; // Discount percentage
+                          const cgstRate = Number(itemField.CGST) || 0; // CGST rate
+                          const sgstRate = Number(itemField.SGST) || 0; // SGST rate
 
-    // Validate inputs to ensure numbers are correct
-    if (
-      isNaN(unitPrice) ||
-      unitPrice <= 0 ||
-      isNaN(quantity) ||
-      quantity < 0 ||
-      isNaN(grams) ||
-      grams < 0 ||
-      isNaN(discount) ||
-      discount < 0 ||
-      discount > 100 ||
-      isNaN(cgstRate) ||
-      cgstRate < 0 ||
-      isNaN(sgstRate) ||
-      sgstRate < 0
-    ) {
-      return "0.00"; // Return 0 if values are invalid
-    }
+                          // Validate inputs to ensure numbers are correct
+                          if (
+                            isNaN(unitPrice) ||
+                            unitPrice <= 0 ||
+                            isNaN(quantity) ||
+                            quantity < 0 ||
+                            isNaN(grams) ||
+                            grams < 0 ||
+                            isNaN(discount) ||
+                            discount < 0 ||
+                            discount > 100 ||
+                            isNaN(cgstRate) ||
+                            cgstRate < 0 ||
+                            isNaN(sgstRate) ||
+                            sgstRate < 0
+                          ) {
+                            return "0.00"; // Return 0 if values are invalid
+                          }
 
-    // Convert grams to kg correctly
-    const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
+                          // Convert grams to kg correctly
+                          const totalKg = (quantity * 1000 + grams) / 1000; // Convert grams to kg properly
 
-    // Calculate total amount
-    const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
+                          // Calculate total amount
+                          const totalAmount = unitPrice * totalKg; // Correct kg-based multiplication
 
-    // Apply discount
-    const discountedAmount = totalAmount * (1 - discount / 100);
+                          // Apply discount
+                          const discountedAmount =
+                            totalAmount * (1 - discount / 100);
 
-    // Calculate CGST and SGST
-    const cgstAmount = (discountedAmount * cgstRate) / 100;
-    const sgstAmount = (discountedAmount * sgstRate) / 100;
+                          // Calculate CGST and SGST
+                          const cgstAmount =
+                            (discountedAmount * cgstRate) / 100;
+                          const sgstAmount =
+                            (discountedAmount * sgstRate) / 100;
 
-    // Calculate final total amount after adding CGST and SGST
-    const finalAmount = discountedAmount + cgstAmount + sgstAmount;
+                          // Calculate final total amount after adding CGST and SGST
+                          const finalAmount =
+                            discountedAmount + cgstAmount + sgstAmount;
 
-    // Return the final amount, fixed to 2 decimal places
-    return finalAmount.toFixed(2);
-  })()}
-  disabled
-/>
-
+                          // Return the final amount, fixed to 2 decimal places
+                          return finalAmount.toFixed(2);
+                        })()}
+                        disabled
+                      />
                     </TableCell>
 
                     <TableCell align="right">
@@ -645,15 +781,15 @@ const logoId=localStorage.getItem('logo');
             <p>Sub total:</p>
             <h4>{(Math.round(subTotal * 10) / 10).toLocaleString()}</h4>
           </div>
-          {/* <div className={styles.summaryItem}>
-            <p>VAT(%):</p>
+          <div className={styles.summaryItem}>
+            <p>Delivery Charges(%):</p>
             <h4>{(Math.round(vat * 10) / 10).toLocaleString()}</h4>
-          </div> */}
+          </div>
           <div className={styles.summaryItem}>
             <p>Total</p>
             <h4 style={{ color: "black", fontSize: "18px", lineHeight: "8px" }}>
-              {currency} {toCommas(Math.round(total * 10) / 10).toLocaleString()}
-
+              {currency}{" "}
+              {toCommas(Math.round(total * 10) / 10).toLocaleString()}
             </h4>
           </div>
         </div>
@@ -662,7 +798,7 @@ const logoId=localStorage.getItem('logo');
           <Container>
             <Grid container>
               <Grid item style={{ marginTop: "16px", marginRight: 10 }}>
-                {/* <TextField
+                <TextField
                   type="text"
                   step="any"
                   name="rates"
@@ -670,8 +806,8 @@ const logoId=localStorage.getItem('logo');
                   value={rates}
                   onChange={handleRates}
                   placeholder="e.g 10"
-                  label="Tax Rates(%)"
-                /> */}
+                  label="Delivery Charge(%)"
+                />
               </Grid>
               <Grid item style={{ marginRight: 10 }}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>

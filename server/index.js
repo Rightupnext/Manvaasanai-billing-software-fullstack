@@ -17,7 +17,7 @@ import invoiceRoutes from './routes/invoices.js'
 import clientRoutes from './routes/clients.js'
 import userRoutes from './routes/userRoutes.js'
 import productRoutes from './routes/productsRoute.js'
-
+import CategoryRoutes from './routes/categoryRoutes.js'
 import profile from './routes/profile.js'
 import pdfTemplate from './documents/index.js'
 // import invoiceTemplate from './documents/invoice.js'
@@ -34,6 +34,7 @@ app.use('/clients', clientRoutes)
 app.use('/users', userRoutes)
 app.use('/profiles', profile)
 app.use("/products", productRoutes);
+app.use("/category", CategoryRoutes);
 
 // NODEMAILER TRANSPORT FOR SENDING INVOICE VIA EMAIL
 const transporter = nodemailer.createTransport({

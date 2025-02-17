@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// const API = axios.create({ baseURL: 'http://localhost:5000'})
-const API = axios.create({ baseURL: process.env.REACT_APP_API})
+const API = axios.create({ baseURL: 'http://localhost:5000'})
+// const API = axios.create({ baseURL: process.env.REACT_APP_API})
 
 API.interceptors.request.use((req) => {
     if(localStorage.getItem('profile')) {
@@ -51,3 +51,17 @@ export const updateProduct = ( updatedProduct) => API.put(`/products/update-kilo
 
 // Delete a product
 export const deleteProduct = (id) => API.delete(`/products/delete-product/${id}`);
+
+
+
+// Fetch all categories
+export const fetchCategory = () => API.get('/category');
+
+// Add a new category
+export const addCategory = (category) => API.post('/category/add-categories', category);
+
+// Update an existing category
+export const updateCategory = (updatedCategory, id) => API.put(`/category/update-category/${id}`, updatedCategory);
+
+// Delete a category
+export const deleteCategory = (id) => API.delete(`/category/delete-category/${id}`);
