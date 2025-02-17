@@ -141,7 +141,7 @@ function RecentPaymentHistoryTable({ paymentHistory }) {
     []
   );
   return (
-    <div className="h-[500px] w-full px-[73px]">
+    <div className="h-[500px] w-full px-[83px]">
       <AgGridReact
         rowData={paymentHistory}
         columnDefs={columnDefs}
