@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer } from '@electron-toolkit/utils';
-const SERVER_URL = 'http://localhost:5001';
+const SERVER_URL = 'https://rightupnextbilling.store/';
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 900,
