@@ -43,8 +43,8 @@ function Chart({ paymentHistory }) {
       style={{
         backgroundColor: "white",
         textAlign: "center",
-        width: "90%",
-        margin: "10px auto",
+        width: "87%",
+        margin: "30px auto",
         padding: "10px",
       }}
     >

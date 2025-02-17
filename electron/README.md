@@ -1,4 +1,4 @@
-# electron
+# rightupnext
 
 An Electron application with React
 

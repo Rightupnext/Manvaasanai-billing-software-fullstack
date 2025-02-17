@@ -12,6 +12,18 @@ import { Check, Pie, Bag, Card, Clock, Frown } from "./Icons";
 import Spinner from "../Spinner/Spinner";
 import RecentPaymentHistoryTable from "./RecentPaymentHistoryTable";
 
+import {
+  FaDollarSign,
+  FaClock,
+  FaCalculator,
+  FaFileInvoice,
+  FaCheckCircle,
+  FaPercentage,
+  FaExclamationTriangle,
+  FaHourglassEnd,
+  FaRupeeSign,
+} from "react-icons/fa";
+
 const Dashboard = () => {
   const location = useLocation();
   const history = useHistory();
@@ -103,115 +115,120 @@ const Dashboard = () => {
       </div>
     );
   }
+  const cards = [
+    {
+      title: "Payment Received ",
+      value: `${toCommas(Math.round(totalPaid * 10) / 10)}`,
+      icon: FaRupeeSign,
+      bgColor: "bg-chart-1",
+      textColor: "text-white",
+    },
+    {
+      title: "Pending Amount",
+      value: `${toCommas(
+        Math.round((totalAmount - totalPaid) * 10) / 10
+      ).toLocaleString()}`,
+      icon: FaClock,
+      bgColor: "bg-chart-2",
+      textColor: "text-white",
+    },
+    {
+      title: "Total Amount",
+      value: `${toCommas(Math.round(totalAmount * 10) / 10).toLocaleString()}`,
+      icon: FaCalculator,
+      bgColor: "bg-chart-3",
+      textColor: "text-white",
+    },
+    {
+      title: "Total Invoices",
+      value: `${invoices.length}`,
+      icon: FaFileInvoice,
+      bgColor: "bg-chart-4",
+      textColor: "text-white",
+    },
+    {
+      title: "Paid Invoices",
+      value: `${paid.length}`,
+      icon: FaCheckCircle,
+      bgColor: "bg-chart-5",
+      textColor: "text-white",
+    },
+    {
+      title: "Partially Paid",
+      value: `${partial.length}`,
+      icon: FaPercentage,
+      bgColor: "bg-chart-6",
+      textColor: "text-white",
+    },
+    {
+      title: "Unpaid Invoices",
+      value: `${unpaidInvoice.length}`,
+      icon: FaExclamationTriangle,
+      bgColor: "bg-chart-7",
+      textColor: "text-white",
+    },
+    {
+      title: "Overdue Invoices",
+      value: `${overDue.length}`,
+      icon: FaHourglassEnd,
+      bgColor: "bg-chart-8",
+      textColor: "text-white",
+    },
+  ];
+
+  const Card = React.memo(
+    ({ title, value, icon: Icon, bgColor, textColor }) => (
+      <div
+        className={`p-6 rounded-lg ${bgColor} transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer`}
+        role="button"
+        tabIndex={0}
+      >
+        <div className="flex items-center justify-between">
+          <div className={`text-2xl ${textColor}`}>
+            <Icon />
+          </div>
+        </div>
+        <div className="mt-4">
+          <h3 className={`text-sm font-semibold ${textColor}`}>{title}</h3>
+          <p className={`text-2xl font-bold mt-1 ${textColor}`}>{value}</p>
+        </div>
+      </div>
+    )
+  );
 
   return (
-    <div className={styles.pageContainer}>
-      <section className={styles.stat}>
-        <ul className={styles.autoGrid}>
-          <li
-            className={styles.listItem}
-            style={{ backgroundColor: "#1976d2", color: "white" }}
-          >
-            <div>
-              <p>{toCommas(Math.round(totalPaid * 10) / 10).toLocaleString()}</p>
-              <h2 style={{ color: "white" }}>Payment Received</h2>
-            </div>
-            <div>
-              <Check />
-            </div>
-          </li>
+    <>
+      <div className="min-h-screen bg-background p-[30px]">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-heading font-heading text-foreground mb-8 font-bold text-xl">
+            Financial Overview
+          </h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {cards.map((card, index) => (
+              <Card key={index} {...card} />
+            ))}
+          </div>
+        </div>
 
-          <li className={styles.listItem}>
-            <div>
-              <p>{toCommas(Math.round((totalAmount - totalPaid) * 10) / 10).toLocaleString()}</p>
-              <h2>Pending Amount</h2>
-            </div>
-            <div>
-              <Pie />
-            </div>
-          </li>
-
-          <li className={styles.listItem}>
-            <div>
-              <p>{toCommas(Math.round(totalAmount * 10) / 10).toLocaleString()}</p>
-              <h2>Total Amount</h2>
-            </div>
-            <div>
-              <Bag />
-            </div>
-          </li>
-
-          <li className={styles.listItem}>
-            <div>
-              <p>{invoices.length}</p>
-              <h2>Total Invoices</h2>
-            </div>
-            <div>
-              <Card />
-            </div>
-          </li>
-
-          <li
-            className={styles.listItem}
-            style={{ backgroundColor: "#206841", color: "white" }}
-          >
-            <div>
-              <p>{paid.length}</p>
-              <h2 style={{ color: "white" }}>Paid Invoices</h2>
-            </div>
-            <div>
-              <Check />
-            </div>
-          </li>
-
-          <li className={styles.listItem}>
-            <div>
-              <p>{partial.length}</p>
-              <h2>Partially Paid Invoices</h2>
-            </div>
-            <div>
-              <Pie />
-            </div>
-          </li>
-
-          <li className={styles.listItem}>
-            <div>
-              <p>{unpaidInvoice.length}</p>
-              <h2>Unpaid Invoices</h2>
-            </div>
-            <div>
-              <Frown />
-            </div>
-          </li>
-
-          <li className={styles.listItem}>
-            <div>
-              <p>{overDue.length}</p>
-              <h2>Overdue</h2>
-            </div>
-            <div>
-              <Clock />
-            </div>
-          </li>
-        </ul>
-      </section>
-
-      {paymentHistory.length !== 0 && (
         <section>
-          <Chart paymentHistory={paymentHistory} />
+          <h1
+            style={{ textAlign: "center", padding: "30px" }}
+            className="font-bold"
+          >
+            {paymentHistory.length
+              ? "Recent Payments"
+              : "No payment received yet"}
+          </h1>
+
+          <RecentPaymentHistoryTable paymentHistory={paymentHistory} />
         </section>
-      )}
-
-      <section>
-        <h1 style={{ textAlign: "center", padding: "30px" }}>
-          {paymentHistory.length
-            ? "Recent Payments"
-            : "No payment received yet"}
-        </h1>
-
-        <RecentPaymentHistoryTable paymentHistory={paymentHistory} />
-      </section>
-    </div>
+        {paymentHistory.length !== 0 && (
+          <section>
+            <Chart paymentHistory={paymentHistory} />
+          </section>
+        )}
+      </div>
+    </>
   );
 };
 

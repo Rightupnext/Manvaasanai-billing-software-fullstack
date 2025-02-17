@@ -1,23 +1,17 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import icon from '../../resources/icon.png?asset';
-
+import { electronApp, optimizer } from '@electron-toolkit/utils';
+const SERVER_URL = 'http://localhost:5001';
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200, // Increased width for better view
-    height: 800, // Increased height
+    width: 900,
+    height: 670,
     show: false,
-    icon: path.join(__dirname, 'assets', 'pixelcut-export-logo.ico'),
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    devTools: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      nodeIntegration: false, // Disable Node.js in renderer for security
-      contextIsolation: true ,
-      devTools: false
+      sandbox: false
     }
   });
 
@@ -30,14 +24,14 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  // Load the external website
-  mainWindow.loadURL('http://localhost:5001/');
-
-  // Optional: Open DevTools for debugging
-  // mainWindow.webContents.openDevTools();
+  // ✅ Only load `SERVER_URL` in both development & production
+  mainWindow.loadURL(SERVER_URL).catch((err) => {
+    console.error('Failed to load:', err);
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html')); // Fallback
+  });
 }
 
-// This method will be called when Electron has finished initialization
+// App initialization
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron');
 
@@ -54,7 +48,7 @@ app.whenReady().then(() => {
   });
 });
 
-// Quit when all windows are closed, except on macOS
+// Quit when all windows are closed (except macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
