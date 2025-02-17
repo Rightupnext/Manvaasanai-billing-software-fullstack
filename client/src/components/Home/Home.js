@@ -4,8 +4,8 @@ import Logo from '../../images/HopageLgo.png'
 const Home = () => {
    
     return (
-        <div class="font-sans">
-        <div class="grid lg:grid-cols-2 items-center lg:gap-y-6 bg-blue-500">
+        <div class="font-sans  ">
+        <div class="grid lg:grid-cols-2 items-center lg:gap-y-6 bg-blue-500 ">
           <div class="max-lg:order-1 max-lg:text-center sm:p-12 p-4">
             <h2 class="text-white lg:text-5xl text-3xl font-bold lg:!leading-[56px]">Streamline Your Billing with RightUpNext Innovation</h2>
             <p class="text-gray-800 mt-6 text-base leading-relaxed">At RightUpNext Innovation, we provide modern, efficient, and user-friendly billing software designed to simplify your financial management. From automated invoicing to real-time payment tracking, our solution ensures seamless operations, accuracy, and security for your business.</p>
