@@ -31,7 +31,7 @@ export const signin = async (req, res)=> {
         if(!isPasswordCorrect) return res.status(400).json({message: "Invalid credentials"})
 
         //If crednetials are valid, create a token for the user
-        const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, SECRET, { expiresIn: "1h" })
+        const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, SECRET, { expiresIn: "1d" })
         
         //Then send the token to the client/frontend
         res.status(200).json({ result: existingUser, userProfile, token })
@@ -58,7 +58,7 @@ export const signup = async (req, res)=> {
 
         const result = await User.create({ email, password: hashedPassword, name: `${firstName} ${lastName}`, bio })
 
-        const token = jwt.sign({ email: result.email, id: result._id }, SECRET, { expiresIn: "1h" })
+        const token = jwt.sign({ email: result.email, id: result._id }, SECRET, { expiresIn: "1d" })
         
         res.status(200).json({ result, userProfile, token })
 

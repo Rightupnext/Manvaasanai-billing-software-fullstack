@@ -9,13 +9,15 @@ function createWindow() {
     width: 1200, // Increased width for better view
     height: 800, // Increased height
     show: false,
+    icon: path.join(__dirname, 'assets', 'pixelcut-export-logo.ico'),
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       nodeIntegration: false, // Disable Node.js in renderer for security
-      contextIsolation: true // Isolate context for security
+      contextIsolation: true ,
+      devTools: false
     }
   });
 

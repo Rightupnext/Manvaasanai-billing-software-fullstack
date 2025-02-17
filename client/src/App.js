@@ -18,6 +18,7 @@ import Settings from './components/Settings/Settings';
 import Forgot from './components/Password/Forgot'
 import Reset from './components/Password/Reset'
 import AddStock from './components/stock Management/AddStock';
+import addCategory from './components/category/addCategory';
 
 function App() {
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="/forgot" exact component={Forgot} />
           <Route path="/reset/:token" exact component={Reset} />
           <Route path="/addstock" exact component={AddStock} />
+          <Route path="/addCategory" exact component={addCategory} />
           <Redirect exact from="/new-invoice" to="/invoice" />
 
         </Switch>
