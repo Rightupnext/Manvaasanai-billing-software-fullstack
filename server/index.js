@@ -27,7 +27,12 @@ dotenv.config()
 
 app.use((express.json({ limit: "30mb", extended: true})))
 app.use((express.urlencoded({ limit: "30mb", extended: true})))
-app.use((cors()))
+app.use(cors({ 
+    origin: '*', // Allows all domains to make requests to your backend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specifies allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Specifies allowed headers
+  }));
+  
 
 app.use('/invoices', invoiceRoutes)
 app.use('/clients', clientRoutes)
