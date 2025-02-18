@@ -333,7 +333,7 @@ const Invoice = () => {
   }
   const logoId = localStorage.getItem("logo");
   const getImageURL = (id) => {
-    return `http://localhost:5000/profiles/image/${id}`;
+    return `${process.env.REACT_APP_API}/profiles/image/${id}`;
   };
 
   return (

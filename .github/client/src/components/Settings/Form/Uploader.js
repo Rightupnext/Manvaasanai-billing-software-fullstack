@@ -37,7 +37,7 @@ export default function Uploader({ form, setForm }) {
     formData.append("userId", user?.result._id);
   
     try {
-      const response = await fetch("http://localhost:5000/profiles/upload", {
+      const response = await fetch(`${process.env.REACT_APP_API}/profiles/upload`, {
         method: "POST",
         body: formData,
       });

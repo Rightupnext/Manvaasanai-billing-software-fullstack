@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const getImageURL = (id) => {
-  return `http://localhost:5000/profiles/image/${id}`;
+  return `${process.env.REACT_APP_API}/profiles/image/${id}`;
 };
 export default function ProfileDetail({ profiles }) {
   const classes = useStyles();
