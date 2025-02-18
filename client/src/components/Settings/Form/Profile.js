@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const getImageURL = (id) => {
-  return `http://localhost:5000/profiles/image/${id}`;
+  return `https://rightupnextbilling.store/api/profiles/image/${id}`;
 };
 export default function ProfileDetail({ profiles }) {
   const classes = useStyles();
