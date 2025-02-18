@@ -208,7 +208,7 @@ const InvoiceDetails = () => {
     return <Spinner />;
   }
   const getImageURL = (id) => {
-    return `https://rightupnextbilling.store/api/profiles/image/${id}`;
+    return `${process.env.REACT_APP_API}/profiles/image/${id}`;
   };
 
   return (

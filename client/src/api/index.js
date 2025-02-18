@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const API = axios.create({ baseURL: 'https://rightupnextbilling.store/api'})
-// const API = axios.create({ baseURL: process.env.REACT_APP_API})
+// const API = axios.create({ baseURL: 'https://rightupnextbilling.store/api'})
+const API = axios.create({ baseURL: process.env.REACT_APP_API})
 
 API.interceptors.request.use((req) => {
     if(localStorage.getItem('profile')) {
