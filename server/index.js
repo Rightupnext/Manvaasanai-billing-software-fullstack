@@ -9,7 +9,7 @@ import nodemailer from 'nodemailer'
 import pdf from 'html-pdf'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
-
+import path from 'path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -97,8 +97,15 @@ app.post('/api/create-pdf', (req, res) => {
 
 //SEND PDF INVOICE
 app.get('/api/fetch-pdf', (req, res) => {
-     res.sendFile(`${__dirname}/invoice.pdf`)
-})
+    const filePath = path.join(__dirname, 'pdfs', 'invoice.pdf');
+
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('PDF not found');
+    }
+});
+
 
 
 app.get('/', (req, res) => {
