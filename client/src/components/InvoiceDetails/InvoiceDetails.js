@@ -208,7 +208,7 @@ const InvoiceDetails = () => {
     return <Spinner />;
   }
   const getImageURL = (id) => {
-    return `http://localhost:5000/profiles/image/${id}`;
+    return `https://rightupnextbilling.store/api/profiles/image/${id}`;
   };
 
   return (
