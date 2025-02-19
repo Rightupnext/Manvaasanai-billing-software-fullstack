@@ -195,7 +195,6 @@ const Invoices = () => {
   
   return (
     <div>
-    <Container style={{width: '85%', paddingTop: '70px', paddingBottom: '50px', border: 'none'}} >
         <TableContainer component={Paper} elevation={0}>
       <Table className={classes.table} aria-label="custom pagination table">
 
@@ -264,7 +263,7 @@ const Invoices = () => {
         </TableFooter>
       </Table>
     </TableContainer>
-    </Container>
+    
   </div>
   );
 }

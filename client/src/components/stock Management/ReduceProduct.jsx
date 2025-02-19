@@ -43,7 +43,7 @@ function ReduceKiloGrams({ handleCloseModel2 }) {
     };
 
     dispatch(updateProductKiloGrams(updatedProduct)).then(() =>
-      dispatch(getProducts),
+      dispatch(getProducts()),
     handleCloseModel2()
     );
 
@@ -75,7 +75,7 @@ function ReduceKiloGrams({ handleCloseModel2 }) {
         </div>
         <div className="my-6">
           <form
-            className="space-y-6 px-4 max-w-sm mx-auto font-[sans-serif]"
+            className="space-y-6 px-4 max-w-lg mx-auto font-[sans-serif]"
             onSubmit={handleSubmit}
           >
             <div>

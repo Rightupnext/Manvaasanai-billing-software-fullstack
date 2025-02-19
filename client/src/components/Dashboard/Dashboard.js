@@ -198,8 +198,8 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-background p-[30px]">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-background ">
+        <div className="mx-[34px]">
           <h1 className="text-heading font-heading text-foreground mb-8 font-bold text-xl">
             Financial Overview
           </h1>
@@ -212,7 +212,7 @@ const Dashboard = () => {
 
         <section>
           <h1
-            style={{ textAlign: "center", padding: "30px" }}
+            style={{ textAlign: "center", margin:'32px' }}
             className="font-bold"
           >
             {paymentHistory.length

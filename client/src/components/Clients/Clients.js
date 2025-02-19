@@ -260,7 +260,7 @@ const Clients = ({ setOpen, setCurrentId, clients }) => {
   return (
     <div >
       <h1 className="text-gray-700 text-center text-4xl py-2">Customer's</h1>
-      <div className="h-[500px] w-full ml-[40px] px-[73px] ">
+      <div className="xl:h-[700px]  w-full">
         <AgGridReact
           rowData={clients}
           columnDefs={columnDefs}
