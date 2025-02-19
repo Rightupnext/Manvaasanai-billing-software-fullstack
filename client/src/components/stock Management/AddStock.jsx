@@ -25,7 +25,7 @@ function AddStock() {
   const categories = useSelector((state) => state.categories);
   useEffect(() => {
     dispatch(getProducts());
-  }, [dispatch]);
+  }, [dispatch,]);
   useEffect(() => {
     dispatch(GetCategory());
   }, [dispatch]);
@@ -195,8 +195,8 @@ function AddStock() {
             modelOpen3={modelOpen3}
           />
         )}
+        {modelOpen2 && (<ReduceProduct handleCloseModel2={handleModelClose2} />)}
         <ProductChart />
-        {modelOpen2 && <ReduceProduct handleCloseModel2={handleModelClose2} />}
       </div>
     </>
   );

@@ -345,7 +345,7 @@ const Invoice = () => {
             <Grid item>
               <img
                 alt="Logo"
-                src={Logo}
+                src={getImageURL(logoId)}
                 className="w-[125px] mt-[10px] h-[125px]"
               />
             </Grid>

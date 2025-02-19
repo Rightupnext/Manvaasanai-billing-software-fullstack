@@ -2,12 +2,12 @@ import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 function Chart({ paymentHistory }) {
-  let paymentDates = paymentHistory.map((record) => 
+  let paymentDates = paymentHistory.map((record) =>
     new Date(record.datePaid).toLocaleDateString()
   );
 
-  let paymentReceived = paymentHistory.map((record) => 
-    Math.round(record.amountPaid * 10) / 10 // Ensures one decimal place rounding
+  let paymentReceived = paymentHistory.map(
+    (record) => Math.round(record.amountPaid * 10) / 10 // Ensures one decimal place rounding
   );
 
   const series = [
@@ -41,15 +41,17 @@ function Chart({ paymentHistory }) {
   return (
     <div
       style={{
-        backgroundColor: "white",
         textAlign: "center",
-        width: "87%",
-        margin: "30px auto",
         padding: "10px",
       }}
     >
       <br />
-      <ReactApexChart options={options} series={series} type="bar" height={300} />
+      <ReactApexChart
+        options={options}
+        series={series}
+        type="bar"
+        height={300}
+      />
     </div>
   );
 }
